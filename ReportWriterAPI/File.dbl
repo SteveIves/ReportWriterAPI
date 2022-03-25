@@ -1,0 +1,16 @@
+import System
+import System.Collections.Generic
+import System.Text
+
+
+namespace ReportWriterAPI
+
+    public class File
+
+        ; FILE file.structure [ID id] [PARENT pid] [SEPARATE] 
+        ; [RELATION name] | [[LINK_FIELD link_field] [LINK_NAME link_name] 
+        ; [TO_KEY to_key] [LINK_SEGMENT segment ...]]
+
+    endclass
+
+endnamespace

@@ -1,0 +1,21 @@
+import System
+import System.Collections.Generic
+import System.Text
+
+
+namespace ReportWriterAPI
+
+    public class FieldSpec
+
+        ; A simple field_spec has the format
+        ; field [FID fid]
+        ;
+        ; A field_spec with optional subscripting has the format
+        ; field[[subs_value[,subs_value ...]]] [FID fid]
+        ;
+        ; A field_spec with optional ranging has the format
+        ; field[(offset:length)] [FID fid]
+
+    endclass
+
+endnamespace

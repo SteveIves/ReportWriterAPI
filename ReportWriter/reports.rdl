@@ -1,0 +1,54 @@
+ 
+;  REPORT DEFINITION LANGUAGE OUTPUT                                            
+;                                                                               
+;  REPORT DEFINITION FILE : .\reports.rpt                                       
+;                                                                               
+;  CREATION DATE           : 25-MAR-2022, 00:29:40                              
+;  ReportWriter VERSION             : 11.1.1i                                   
+ 
+ 
+REPORT	"CUSTOMERS"
+ 
+FILE CUSTOMERS.CUSTOMERS  ID 1
+FILE ORDERS.ORDERS  ID 2  PARENT 1  RELATION 1
+ 
+QUESTION MAXCUSTNUM TYPE NUMERIC SIZE 6 NODECIMAL PROMPT "Max customer number"
+    DESCRIPTION "Max customer number" DEFAULT "999999"
+    INFO LINE "Enter the maximim customer number" REQUIRED
+ 
+CALCULATION CALCFLD TYPE NUMERIC SIZE 18
+    EXPRESSION "CUSTOMERS.PHONE*CUSTOMERS.FAX" DESCRIPTION "PhoneByFax"
+ 
+SELECT CUSTOMERS.CUSTOMERS.CUSTOMER_NUMBER LE MAXCUSTNUM
+ 
+LINE REPORT_HEADER
+TEXT "CUSTOMERS" COLUMN 1
+ 
+LINE REPORT_HEADER
+TEXT "This is the report header!!!" COLUMN 1
+ 
+LINE PAGE_HEADER
+TEXT "This is the page header" COLUMN 1
+ 
+LINE PAGE_HEADER
+TEXT " Customer number  Customer name                   Phone Number" COLUMN 1
+ 
+LINE DETAIL
+FIELD CUSTOMERS.CUSTOMERS.CUSTOMER_NUMBER COLUMN 2 HEADER "Customer number"
+    JUST LEFT
+FIELD NAME COLUMN 19 HEADER "Customer name" JUST LEFT
+FIELD PHONE COLUMN 51 HEADER "Phone Number" JUST RIGHT FMTTRUNC RIGHT
+FIELD CALCFLD COLUMN 66 HEADER "PhoneByFax" JUST RIGHT
+ 
+LINE DETAIL
+FIELD ORDER_NUMBER COLUMN 2 HEADER "Order number" JUST RIGHT
+FIELD DATE_ORDERED COLUMN 16 HEADER "Date ordered" JUST LEFT
+ 
+LINE PAGE_FOOTER
+TEXT "This is the pahe footer!" COLUMN 1
+ 
+LINE REPORT_FOOTER
+TEXT "This is the report footer" COLUMN 1
+ 
+ 
+ 

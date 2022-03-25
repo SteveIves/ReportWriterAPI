@@ -1,0 +1,57 @@
+<Project Sdk="Microsoft.NET.Sdk" DefaultTargets="restore;Build">
+  <Import Project="$(SolutionDir)Common.props" />
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <DefaultLanguageSourceExtension>.dbl</DefaultLanguageSourceExtension>
+    <EnableDefaultItems>false</EnableDefaultItems>
+    <ProjectGuid>{34957677-d735-4fff-8bdd-557a7ebd3279}</ProjectGuid>
+    <Name>ReportWriterAPI</Name>
+    <AssemblyName>Synergex.PSG.ReportWriterAPI</AssemblyName>
+    <Prefer32Bit>False</Prefer32Bit>
+    <EnableCommonProperties>True</EnableCommonProperties>
+    <IncludeDebugInformation>False</IncludeDebugInformation>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="Synergex.SynergyDE.Build" Version="22.*" />
+    <PackageReference Include="Synergex.SynergyDE.synrnt" Version="12.*" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="ConditionSpec.dbl" />
+    <Compile Include="FieldSpec.dbl" />
+    <Compile Include="PageHeaderFooterLine.dbl" />
+    <Compile Include="PrePostBreakLine.dbl" />
+    <Compile Include="Properties\AssemblyInfo.dbl" />
+    <Compile Include="ReportHeaderFooterLine.dbl" />
+    <Compile Include="CalculationField.dbl" />
+    <Compile Include="EnvironmentField.dbl" />
+    <Compile Include="Field.dbl" />
+    <Compile Include="File.dbl" />
+    <Compile Include="DetailLine.dbl" />
+    <Compile Include="QuestionField.dbl" />
+    <Compile Include="Report.dbl" />
+    <Compile Include="Selection.dbl" />
+    <Compile Include="SortField.dbl" />
+    <Compile Include="SubtotalAccessField.dbl" />
+    <Compile Include="TempTextField.dbl" />
+    <Compile Include="TextField.dbl" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Properties" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="LICENSE.TXT">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="ReportWriterAPI.nuspec">
+      <SubType>Content</SubType>
+    </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Repository\Repository.synproj">
+      <Name>Repository</Name>
+      <Project>{8c42e82c-3c18-43ac-b25d-2bdd5479a5cf}</Project>
+      <Private>True</Private>
+      <ReferenceOutputAssembly>False</ReferenceOutputAssembly>
+    </ProjectReference>
+  </ItemGroup>
+</Project>

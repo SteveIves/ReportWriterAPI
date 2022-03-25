@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<package >
+  <metadata>
+    <id>ReportWriterAPI</id>
+    <version>0.1.0</version>
+    <authors>Steve.Ives</authors>
+    <requireLicenseAcceptance>true</requireLicenseAcceptance>
+    <license type="file">LICENSE.TXT</license>
+    <!-- <icon>icon.png</icon> -->
+    <projectUrl>https://github.com/SteveIves/ReportWriterAPI</projectUrl>
+    <description>A Synergy .NET library that implements an API capable of parsing Synergy ReportWriter report schema files and exposing the reports defined therein as an object tree.</description>
+    <releaseNotes>Initial skeleton code, not yet operational.</releaseNotes>
+    <copyright>$copyright$</copyright>
+    <tags>Synergy CodeGen ReportWriter</tags>
+    <dependencies>
+      <group targetFramework=".NETStandard2.0">
+      </group>
+    </dependencies>
+  </metadata>
+</package>

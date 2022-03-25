@@ -1,0 +1,15 @@
+import System
+import System.Collections.Generic
+import System.Text
+
+
+namespace ReportWriterAPI
+
+    public class SortField
+
+        ; SORT field_spec [REVERSE] [LINEBREAK] [PAGEBREAK] [MERGE]
+        ; [BY field_spec [REVERSE] [LINEBREAK] [PAGEBREAK] [MERGE]...]
+
+    endclass
+
+endnamespace

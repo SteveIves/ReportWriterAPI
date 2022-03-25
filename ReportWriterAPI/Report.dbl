@@ -1,0 +1,90 @@
+
+import System
+import System.Collections.Generic
+import System.IO
+import System.Text
+
+namespace ReportWriterAPI
+
+    public class Report
+
+        public method Report
+            required in aReportFile, string
+        proc
+            if (File.Exists(aReportFile)) then
+            begin
+                ParseReportDefinition(aReportFile)
+            end
+            else
+            begin
+                throw new ApplicationException("ERROR: Report definition file {0} was not found!")
+            end
+        endmethod
+
+        private method parseReportDefinition, void
+            required in aReportFile, string
+        proc
+            ; Load the report definition into a list
+            ; - Ignore blank lines
+            ; - Ignore lines beginning ;
+
+            data reportLines, @List<string>, new List<string>(File.ReadAllLines(aReportFile))
+
+            ; Consolidate multiple lines into single lines
+
+
+            ; First should be the definition of the report name, like:
+            ; REPORT "CUSTOMERS"
+
+
+            ; Now FILE definitions, one or more, e.g.:
+            ; FILE CUSTOMERS.CUSTOMERS  ID 1
+
+            ; Selections
+
+
+
+        endmethod
+
+        ; REPORT "name"
+
+        public readwrite property Name, string
+
+        ; Report attributes
+
+        public readwrite property CalculationFields, @List<CalculationField>
+
+        public readwrite property EnvironmentFields, @List<EnvironmentField>
+
+        public readwrite property Files, @List<File>
+
+        public readwrite property QuestionFields, @List<QuestionField>
+
+        public readwrite property Selections, @List<Selection>
+
+        public readwrite property SortFields, @List<SortField>
+
+        public readwrite property SubtotalAccessFields, @List<SubtotalAccessField>
+
+        public readwrite property TempTextFields, @List<TempTextField>
+
+        ; Report sections
+
+        public readwrite property ReportHeaderLines, @List<ReportHeaderFooterLine>
+
+        public readwrite property PageHeaderLines, @List<PageHeaderFooterLine>
+
+        public readwrite property ReportPreBreakLines, @List<PrePostBreakLine>
+
+        public readwrite property ReportDetailLines, @List<DetailLine>
+
+        public readwrite property ReportPostBreakLines, @List<PrePostBreakLine>
+
+        public readwrite property PageFooterLines, @List<PageHeaderFooterLine>
+
+        public readwrite property ReportFooterLines, @List<ReportHeaderFooterLine>
+
+
+    endclass
+
+endnamespace

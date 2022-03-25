@@ -1,0 +1,39 @@
+﻿<Project ToolsVersion="15.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <Name>Repository</Name>
+    <OutputName>Repository</OutputName>
+    <ProjectGuid>{8c42e82c-3c18-43ac-b25d-2bdd5479a5cf}</ProjectGuid>
+    <ProjectTypeGuids>{1BD24377-84D3-44B8-B8F3-81C1EB3E22B4};{BBD0F5D1-1CC4-42fd-BA4C-A96779C64378}</ProjectTypeGuids>
+    <NugetTargetMoniker>RPS,Version=1.0</NugetTargetMoniker>
+    <OutputType>RPS</OutputType>
+    <EnableCommonProperties>True</EnableCommonProperties>
+    <AssemblyName>Repository</AssemblyName>
+    <RootNamespace>Repository</RootNamespace>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <OutputPath>.\</OutputPath>
+    <UnevaluatedOutputPath>.\</UnevaluatedOutputPath>
+    <MOutputName>rpsmain</MOutputName>
+    <TOutputName>rpstext</TOutputName>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <UseExistingRepository>True</UseExistingRepository>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <OutputPath>.\</OutputPath>
+    <UnevaluatedOutputPath>.\</UnevaluatedOutputPath>
+    <MOutputName>rpsmain</MOutputName>
+    <TOutputName>rpstext</TOutputName>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="repository.scm" />
+  </ItemGroup>
+  <PropertyGroup>
+    <PreBuildEvent>
+    </PreBuildEvent>
+    <PostBuildEvent>
+    </PostBuildEvent>
+  </PropertyGroup>
+</Project>

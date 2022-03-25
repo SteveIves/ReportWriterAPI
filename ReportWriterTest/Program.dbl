@@ -1,0 +1,16 @@
+import System
+import System.Collections.Generic
+import System.Text
+
+namespace ReportWriterTest
+
+    ;;; <summary>
+    ;;; The main entry point for the application.
+    ;;; </summary>
+    main
+
+    proc
+
+    endmain
+
+endnamespace

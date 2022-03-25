@@ -1,0 +1,31 @@
+import System
+import System.Collections.Generic
+import System.Text
+
+
+namespace ReportWriterAPI
+
+    public class PrePostBreakLine
+
+        ; LINE PRE-BREAK|POST-BREAK [IF conditional_spec] [SUPPRESS BLANKLINE] BREAKFIELD field_spec [SID sid]
+
+        ; Line attributes
+
+        public readwrite property BreakField, @FieldSpec
+
+        public readwrite property ConditionSpec, @ConditionSpec
+
+        public readwrite property SortId, int
+
+        public readwrite property SuppressBlankLine, boolean
+
+        ; Line content
+
+        public readwrite property Fields, @List<Field>
+
+        public readwrite property TextFields, @List<TextField>
+
+
+    endclass
+
+endnamespace

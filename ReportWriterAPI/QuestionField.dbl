@@ -1,0 +1,16 @@
+import System
+import System.Collections.Generic
+import System.Text
+
+
+namespace ReportWriterAPI
+
+    public class QuestionField
+
+        ; QUESTION name TYPE type PROMPT "prompt" [DESCRIPTION "description"]
+        ; [FORMAT "format"] [DEFAULT "default"] [INFO LINE "info_line"] [JUST just]
+        ; [REQUIRED]
+
+    endclass
+
+endnamespace

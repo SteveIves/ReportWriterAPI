@@ -1,0 +1,24 @@
+import System
+import System.Collections.Generic
+import System.Text
+
+
+namespace ReportWriterAPI
+
+    public class DetailLine
+
+        ; LINE DETAIL [IF conditional_spec]
+
+        ; Line attributes
+
+        public readwrite property ConditionSpec, @ConditionSpec
+
+        ; Line content
+
+        public readwrite property Fields, @List<Field>
+
+        public readwrite property TextFields, @List<TextField>
+
+    endclass
+
+endnamespace

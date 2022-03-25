@@ -1,0 +1,16 @@
+import System
+import System.Collections.Generic
+import System.Text
+
+
+namespace ReportWriterAPI
+
+    public class Field
+
+        ; FIELD field_spec [COLUMN column] [HEADER "header"] [JUST just] 
+        ; [FORMAT "format"] [FMTTRUNC truncate] [STRIP] [STRIPCHR "strip_char"]
+        ; [TOTAL] [IF conditional_spec]
+
+    endclass
+
+endnamespace

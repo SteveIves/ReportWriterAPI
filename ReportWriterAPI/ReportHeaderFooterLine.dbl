@@ -1,0 +1,29 @@
+import System
+import System.Collections.Generic
+import System.Text
+
+
+namespace ReportWriterAPI
+
+    public class ReportHeaderFooterLine
+
+        ; LINE REPORT_HEADER|REPORT_FOOTER [VISIBLE|NOTVISIBLE] [NOTSEPARATE]
+        ; [NUMBLANK LINES blank_lines]
+
+        ; Line attributes
+
+        public readwrite property BlankLines, int
+
+        public readwrite property SeparatePage, boolean
+
+        public readwrite property Visible, boolean
+
+        ; Line content
+
+        public readwrite property Fields, @List<Field>
+
+        public readwrite property TextFields, @List<TextField>
+
+    endclass
+
+endnamespace

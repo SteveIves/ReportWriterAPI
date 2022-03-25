@@ -1,0 +1,14 @@
+import System
+import System.Collections.Generic
+import System.Text
+
+
+namespace ReportWriterAPI
+
+    public class TempTextField
+
+        ; TEMPTEXT name TTEXT "text" [DESCRIPTION "description"]
+
+    endclass
+
+endnamespace

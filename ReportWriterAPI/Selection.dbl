@@ -1,0 +1,14 @@
+import System
+import System.Collections.Generic
+import System.Text
+
+
+namespace ReportWriterAPI
+
+    public class Selection
+
+        ; SELECT conditional_spec
+
+    endclass
+
+endnamespace
