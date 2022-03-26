@@ -1,7 +1,7 @@
 
 namespace ReportWriterAPI
 
-    public enum CalculationFieldType
+    public enum FieldType
         AlphaNumeric,   1
         Numeric,        2
         Date,           3
@@ -12,6 +12,15 @@ namespace ReportWriterAPI
         Left,           1
         Center,         2
         Right,          3
+    endenum
+
+    public enum DateFormat
+        YYPP,           1
+        YYJJJ,          2
+        YYMMDD,         3
+        YYYYPP,         4
+        YYYYJJJ,        5
+        YYYYMMDD,       6
     endenum
 
 endnamespace

@@ -1,6 +1,9 @@
+
 import System
 import System.Collections.Generic
+import System.Linq
 import System.Text
+import System.Text.RegularExpressions
 
 
 namespace ReportWriterAPI
@@ -12,12 +15,29 @@ namespace ReportWriterAPI
         public method DetailLine
             required in schemaRecord, string
         proc
-            ;TODO: Parse the schema record and populate properties
+            data parts = Regex.Matches(schemaRecord, "[\""].+?[\""]|[^ ]+").Cast<Match>().Select(lambda(m){m.Value}).ToList()
 
+            if (parts.Count>2)
+            begin
+                parts.RemoveRange(0,2)
 
+                if (parts[0] == "IF")
+                begin
+                    parts.RemoveAt(0)
 
+                    ;What remains is the conditional spec
 
+                    data ix = 0
+                    data expression = String.Empty
 
+                    for ix from 0 thru parts.Count - 1
+                    begin
+                        expression = String.Format("{0} {1} ",expression,parts[ix])
+                    end
+
+                    Condition = new ConditionSpec(expression)
+                end
+            end
         endmethod
 
         ; Line attributes

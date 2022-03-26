@@ -40,13 +40,13 @@ namespace ReportWriterAPI
                     end
                     using parts[2] select
                     ("ALPHANUMERIC"),
-                        DataType = CalculationFieldType.AlphaNumeric
+                        DataType = FieldType.AlphaNumeric
                     ("NUMERIC"),
-                        DataType = CalculationFieldType.Numeric
+                        DataType = FieldType.Numeric
                     ("DATE"),
-                        DataType = CalculationFieldType.Date
+                        DataType = FieldType.Date
                     ("TIME"),
-                        DataType = CalculationFieldType.Time
+                        DataType = FieldType.Time
                     (),
                         throw new ApplicationException("Invalid CALCULATION TYPE expression detected in report schema!")
                     endusing
@@ -127,7 +127,7 @@ namespace ReportWriterAPI
                 begin
                     if ((parts.Count<2) || String.IsNullOrWhiteSpace(parts[2]))
                     begin
-                        throw new ApplicationException("Invalid CALCULATION ALTERNATE expression detected in report schema!")
+                        throw new ApplicationException("Invalid CALCULATION DESCRIPTION expression detected in report schema!")
                     end
                     Description = parts[2].Replace('"','')
                     parts.RemoveRange(0,2)
@@ -154,14 +154,15 @@ namespace ReportWriterAPI
                 begin
                     if ((parts.Count<2) || String.IsNullOrWhiteSpace(parts[2]))
                     begin
-                        throw new ApplicationException("Invalid FORMAT expression detected in report schema!")
+                        throw new ApplicationException("Invalid CALCULATION FORMAT expression detected in report schema!")
                     end
                     FormatString = parts[2]
                     parts.RemoveRange(0,2)
                 end
                 ("AFTER_SORT"),
                 begin
-
+                    EvaluateAfterSort = true
+                    parts.RemoveAt(0)
                 end
                 endusing
             end
@@ -172,7 +173,7 @@ namespace ReportWriterAPI
         ;;; <summary>
         ;;; The data type of the calculation’s result.
         ;;; </summary>
-        public readwrite property DataType, CalculationFieldType
+        public readwrite property DataType, FieldType
 
         ;;; <summary>
         ;;; The length of the calculation’s result. When using date or time fields in your calculation, the length should match the storage length of the base value in the expression.

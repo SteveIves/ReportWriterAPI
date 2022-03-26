@@ -1,7 +1,9 @@
+
 import System
 import System.Collections.Generic
+import System.Linq
 import System.Text
-
+import System.Text.RegularExpressions
 
 namespace ReportWriterAPI
 
@@ -13,13 +15,177 @@ namespace ReportWriterAPI
         public method EnvironmentField
             required in schemaRecord, string
         proc
-            ;TODO: Parse the schema record and populate properties
+            data parts = Regex.Matches(schemaRecord, "[\""].+?[\""]|[^ ]+").Cast<Match>().Select(lambda(m){m.Value}).ToList()
 
+            data tmpInt, int
 
-
-
-
+            while (parts.Count > 0)
+            begin
+                using parts[0] select
+                ("ENVIRONMENT"),
+                begin
+                    if ((parts.Count<2) || String.IsNullOrWhiteSpace(parts[2]))
+                    begin
+                        throw new ApplicationException("Invalid ENVIRONMENT expression detected in report schema!")
+                    end
+                    Name = parts[2]
+                    parts.RemoveRange(0,2)
+                end
+                ("TYPE"),
+                begin
+                    if ((parts.Count<2) || String.IsNullOrWhiteSpace(parts[2]))
+                    begin
+                        throw new ApplicationException("Invalid ENVIRONMENT TYPE expression detected in report schema!")
+                    end
+                    using parts[2] select
+                    ("ALPHANUMERIC"),
+                        DataType = FieldType.AlphaNumeric
+                    ("NUMERIC"),
+                        DataType = FieldType.Numeric
+                    ("DATE"),
+                        DataType = FieldType.Date
+                    ("TIME"),
+                        DataType = FieldType.Time
+                    (),
+                        throw new ApplicationException("Invalid ENVIRONMENT TYPE expression detected in report schema!")
+                    endusing
+                    parts.RemoveRange(0,2)
+                end
+                ("SIZE"),
+                begin
+                    if ((parts.Count<2) || (!int.TryParse(parts[2],tmpInt)))
+                    begin
+                        throw new ApplicationException("Invalid ENVIRONMENT SIZE expression detected in report schema!")
+                    end
+                    Size = tmpInt
+                    parts.RemoveRange(0,2)
+                end
+                ("DESCRIPTION"),
+                begin
+                    if ((parts.Count<2) || String.IsNullOrWhiteSpace(parts[2]))
+                    begin
+                        throw new ApplicationException("Invalid ENVIRONMENT DESCRIPTION expression detected in report schema!")
+                    end
+                    Description = parts[2].Replace('"','')
+                    parts.RemoveRange(0,2)
+                end
+                ("FORMAT"),
+                begin
+                    if ((parts.Count<2) || String.IsNullOrWhiteSpace(parts[2]))
+                    begin
+                        throw new ApplicationException("Invalid ENVIRONMENT FORMAT expression detected in report schema!")
+                    end
+                    FormatString = parts[2].Replace('"','')
+                    parts.RemoveRange(0,2)
+                end
+                ("USERTEXT"),
+                begin
+                    if ((parts.Count<2) || String.IsNullOrWhiteSpace(parts[2]))
+                    begin
+                        throw new ApplicationException("Invalid ENVIRONMENT USERTEXT expression detected in report schema!")
+                    end
+                    UserText = parts[2].Replace('"','')
+                    parts.RemoveRange(0,2)
+                end
+                ("PRECISION"),
+                begin
+                    if ((parts.Count<2) || (!int.TryParse(parts[2],tmpInt)))
+                    begin
+                        throw new ApplicationException("Invalid ENVIRONMENT PRECISION expression detected in report schema!")
+                    end
+                    Precision = tmpInt
+                    parts.RemoveRange(0,2)
+                end
+                ("STORED"),
+                begin
+                    if ((parts.Count<2) || String.IsNullOrWhiteSpace(parts[2]))
+                    begin
+                        throw new ApplicationException("Invalid ENVIRONMENT STORED expression detected in report schema!")
+                    end
+                    using parts[2] select
+                    ("YYPP"),
+                        Stored = DateFormat.YYPP
+                    ("YYJJJ"),
+                        Stored = DateFormat.YYJJJ
+                    ("YYMMDD"),
+                        Stored = DateFormat.YYMMDD
+                    ("YYYYPP"),
+                        Stored = DateFormat.YYYYPP
+                    ("YYYYJJJ"),
+                        Stored = DateFormat.YYYYJJJ
+                    ("YYYYMMDD"),
+                        Stored = DateFormat.YYYYMMDD
+                    (),
+                        throw new ApplicationException("Invalid ENVIRONMENT STORED expression detected in report schema!")
+                    endusing
+                    parts.RemoveRange(0,2)
+                end
+                ("JUST"),
+                begin
+                    if ((parts.Count<2) || String.IsNullOrWhiteSpace(parts[2]))
+                    begin
+                        throw new ApplicationException("Invalid ENVIRONMENT JUST expression detected in report schema!")
+                    end
+                    using parts[2] select
+                    ("LEFT"),
+                        Justification = FieldJustification.Left
+                    ("CENTER"),
+                        Justification = FieldJustification.Center
+                    ("RIGHT"),
+                        Justification = FieldJustification.Right
+                    (),
+                        throw new ApplicationException("Invalid ENVIRONMENT JUST expression detected in report schema!")
+                    endusing
+                    parts.RemoveRange(0,2)
+                end
+                endusing
+            end
         endmethod
+
+        ;;; <summary>
+        ;;; The name of the temporary environment field to be created. It can have up to 15 characters and cannot contain spaces.
+        ;;; </summary>
+        public readwrite property Name, string
+
+        ;;; <summary>
+        ;;; The data type of the environment field.
+        ;;; </summary>
+        public readwrite property DataType, FieldType
+
+        ;;; <summary>
+        ;;; The length of the environment field.
+        ;;; </summary>
+        public readwrite property Size, int
+
+        ;;; <summary>
+        ;;; The number of characters to the right of the decimal point in an implied-decimal environment field. If the data type is implied-decimal, this attribute must be present, and it must be less than or equal to the size of the field. Otherwise, the field is ignored.
+        ;;; </summary>
+        public readwrite property Precision, int
+
+        ;;; <summary>
+        ;;; A description of the environment field. It can have up to 40 characters.
+        ;;; </summary>
+        public readwrite property Description, string
+
+        ;;; <summary>
+        ;;; The display format for the environment field. It can have up to 40 characters.
+        ;;; </summary>
+        public readwrite property FormatString, string
+
+        ;;; <summary>
+        ;;; A user-defined text string associated with the environment field. It can have up to 40 characters.
+        ;;; </summary>
+        public readwrite property UserText, string
+
+        ;;; <summary>
+        ;;; Specifies the date storage format.
+        ;;; </summary>
+        public readwrite property Stored, DateFormat
+
+        ;;; <summary>
+        ;;; The justification of the environment field.
+        ;;; </summary>
+        public readwrite property Justification, FieldJustification
 
     endclass
 
