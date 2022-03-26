@@ -32,6 +32,7 @@
     <Compile Include="ReportFooterLine.dbl" />
     <Compile Include="ReportHeaderLine.dbl" />
     <Compile Include="ReportLineBase.dbl" />
+    <Compile Include="ReportSettings.dbl" />
     <Compile Include="Selection.dbl" />
     <Compile Include="SortField.dbl" />
     <Compile Include="SubtotalAccessField.dbl" />

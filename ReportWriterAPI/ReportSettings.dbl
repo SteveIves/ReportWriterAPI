@@ -1,0 +1,200 @@
+
+import System
+import System.Collections.Generic
+import System.Linq
+import System.Text
+import System.Text.RegularExpressions
+
+namespace ReportWriterAPI
+
+    public class ReportSettings
+
+        ; Report miscellaneous settings
+
+        ;MISCELLANEOUS [LINES PERPAGE lines] [NUMBLANK LINES blank_lines] 
+        ;[NUMBRKBLANK LINES brk_blank_lines] [BREAK COUNT] [NODATE ANDPAGNUM] 
+        ;[NODETAIL LINES] [NORECORD COUNT] [NOFORMFEED] [NODASHED LINES] 
+        ;[NOTOTAL DESCR] [REPORT DESCR "description"]
+
+        ;;; <summary>
+        ;;; 
+        ;;; </summary>
+        ;;; <param name="schemaRecord"></param>
+        public method Update, void
+            required in schemaRecord, string
+        proc
+            ;MISCELLANEOUS [LINES PERPAGE lines] [NUMBLANK LINES blank_lines] 
+            ;[NUMBRKBLANK LINES brk_blank_lines] [BREAK COUNT] [NODATE ANDPAGNUM] 
+            ;[NODETAIL LINES] [NORECORD COUNT] [NOFORMFEED] [NODASHED LINES] 
+            ;[NOTOTAL DESCR] [REPORT DESCR "description"]
+
+            data parts = Regex.Matches(schemaRecord, "[\""].+?[\""]|[^ ]+").Cast<Match>().Select(lambda(m){m.Value}).ToList()
+
+            ;Remove the "MISCELLANEOUS" token, we already know about that
+            parts.RemoveAt(0)
+
+            data tmpInt, int
+
+            while (parts.Count > 0)
+            begin
+                using parts[0] select
+                ("LINES"),
+                begin
+                    if ((parts.Count<3) || (parts[1]!="PERPAGE") || (!int.TryParse(parts[2],tmpInt)))
+                    begin
+                        throw new ApplicationException("Invalid MISCELLANEOUS LINES expression detected in report schema!")
+                    end
+                    LinesPerPage = tmpInt
+                    parts.RemoveRange(0,3)
+                end
+                ("NUMBLANK"),
+                begin
+                    if ((parts.Count<3) || (parts[1]!="LINES") || (!int.TryParse(parts[2],tmpInt)))
+                    begin
+                        throw new ApplicationException("Invalid MISCELLANEOUS NUMBLANK expression detected in report schema!")
+                    end
+                    LinesBetweenDataRecords = tmpInt
+                    parts.RemoveRange(0,3)
+                end
+                ("NUMBRKBLANK"),
+                begin
+                    if ((parts.Count<3) || (parts[1]!="LINES") || (!int.TryParse(parts[2],tmpInt)))
+                    begin
+                        throw new ApplicationException("Invalid MISCELLANEOUS NUMBRKBLANK expression detected in report schema!")
+                    end
+                    LinesBetweenBreakSets = tmpInt
+                    parts.RemoveRange(0,3)
+                end
+                ("BREAK"),
+                begin
+                    if ((parts.Count<2) || (parts[1]!="COUNT"))
+                    begin
+                        throw new ApplicationException("Invalid MISCELLANEOUS BREAK expression detected in report schema!")
+                    end
+                    BreakCount = true
+                    parts.RemoveRange(0,2)
+                end
+                ("NODATE"),
+                begin
+                    if ((parts.Count<2) || (parts[1]!="ANDPAGNUM"))
+                    begin
+                        throw new ApplicationException("Invalid MISCELLANEOUS NODATE expression detected in report schema!")
+                    end
+                    PageHeadersShowDateAndPageNumber = false
+                    parts.RemoveRange(0,2)
+                end
+                ("NODETAIL"),
+                begin
+                    if ((parts.Count<2) || (parts[1]!="LINES"))
+                    begin
+                        throw new ApplicationException("Invalid MISCELLANEOUS NODETAIL expression detected in report schema!")
+                    end
+                    ShowDetailLines = false
+                    parts.RemoveRange(0,2)
+                end
+                ("NORECORD"),
+                begin
+                    if ((parts.Count<2) || (parts[1]!="COUNT"))
+                    begin
+                        throw new ApplicationException("Invalid MISCELLANEOUS NORECORD expression detected in report schema!")
+                    end
+                    ShowRecordCount = false
+                    parts.RemoveRange(0,2)
+                end
+                ("NOFORMFEED"),
+                begin
+                    UseFormFeed = false
+                    parts.RemoveAt(0)
+                end
+                ("NODASHED"),
+                begin
+                    if ((parts.Count<2) || (parts[1]!="LINES"))
+                    begin
+                        throw new ApplicationException("Invalid MISCELLANEOUS NODASHED expression detected in report schema!")
+                    end
+                    TotalDashedLines = false
+                    parts.RemoveRange(0,2)
+                end
+                ("NOTOTAL"),
+                begin
+                    if ((parts.Count<2) || (parts[1]!="DESCR"))
+                    begin
+                        throw new ApplicationException("Invalid MISCELLANEOUS NOTOTAL expression detected in report schema!")
+                    end
+                    TotalDescriptions = false
+                    parts.RemoveRange(0,2)
+                end
+                ("REPORT"),
+                begin
+                    if ((parts.Count<3) || (parts[1]!="DESCR") || String.IsNullOrWhiteSpace(parts[2]))
+                    begin
+                        throw new ApplicationException("Invalid MISCELLANEOUS REPORT expression detected in report schema!")
+                    end
+                    Description = parts[2].Replace('"','')
+                    parts.RemoveRange(0,3)
+                end
+                endusing
+            end
+
+        endmethod
+
+
+
+        ;;; <summary>
+        ;;; 
+        ;;; </summary>
+        public readwrite property Description, string, String.Empty
+
+        ;;; <summary>
+        ;;; 
+        ;;; </summary>
+        public readwrite property LinesPerPage, int, 66
+
+        ;;; <summary>
+        ;;; 
+        ;;; </summary>
+        public readwrite property LinesBetweenDataRecords, int, 0
+
+        ;;; <summary>
+        ;;; 
+        ;;; </summary>
+        public readwrite property LinesBetweenBreakSets, int, 2
+
+        ;;; <summary>
+        ;;; 
+        ;;; </summary>
+        public readwrite property BreakCount, boolean, false
+
+        ;;; <summary>
+        ;;; 
+        ;;; </summary>
+        public readwrite property PageHeadersShowDateAndPageNumber, boolean, true
+
+        ;;; <summary>
+        ;;; 
+        ;;; </summary>
+        public readwrite property ShowDetailLines, boolean, true
+
+        ;;; <summary>
+        ;;; 
+        ;;; </summary>
+        public readwrite property ShowRecordCount, boolean, true
+
+        ;;; <summary>
+        ;;; 
+        ;;; </summary>
+        public readwrite property UseFormFeed, boolean, true
+
+        ;;; <summary>
+        ;;; 
+        ;;; </summary>
+        public readwrite property TotalDashedLines, boolean, true
+
+        ;;; <summary>
+        ;;; 
+        ;;; </summary>
+        public readwrite property TotalDescriptions, boolean, true
+
+    endclass
+
+endnamespace

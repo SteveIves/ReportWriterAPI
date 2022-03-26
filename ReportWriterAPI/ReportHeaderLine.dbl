@@ -1,24 +1,56 @@
+
 import System
 import System.Collections.Generic
+import System.Linq
 import System.Text
-
+import System.Text.RegularExpressions
 
 namespace ReportWriterAPI
 
     public class ReportHeaderLine extends ReportLineBase
 
-        ; LINE REPORT_HEADER|REPORT_FOOTER [VISIBLE|NOTVISIBLE] [NOTSEPARATE]
+        ; LINE REPORT_HEADER [VISIBLE|NOTVISIBLE] [NOTSEPARATE]
         ; [NUMBLANK LINES blank_lines]
 
         public method ReportHeaderLine
             required in schemaRecord, string
         proc
-            ;TODO: Parse the schema record and populate properties
+            data parts = Regex.Matches(schemaRecord, "[\""].+?[\""]|[^ ]+").Cast<Match>().Select(lambda(m){m.Value}).ToList()
 
+            ;Remove the LINE and REPORT_HEADER tokens, we already know about them
+            parts.RemoveRange(0,2)
 
+            data tmpInt, int
 
-
-
+            while (parts.Count > 0)
+            begin
+                using parts[0] select
+                ("VISIBLE"),
+                begin
+                    Visible = true
+                    parts.RemoveAt(0)
+                end
+                ("NOTVISIBLE"),
+                begin
+                    Visible = false
+                    parts.RemoveAt(0)
+                end
+                ("NOTSEPARATE"),
+                begin
+                    SeparatePage = false
+                    parts.RemoveAt(0)
+                end
+                ("NUMBLANK"),
+                begin
+                    if ((parts.Count<3) || (parts[1]!="LINES") || (!int.TryParse(parts[2],tmpInt)))
+                    begin
+                        throw new ApplicationException("Invalid LINE REPORT_HEADER NUMBLANK expression detected in report schema!")
+                    end
+                    BlankLines = tmpInt
+                    parts.RemoveRange(0,3)
+                end
+                endusing
+            end
         endmethod
 
         ; Line attributes

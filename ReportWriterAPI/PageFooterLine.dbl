@@ -1,23 +1,50 @@
+
 import System
 import System.Collections.Generic
+import System.Linq
 import System.Text
-
+import System.Text.RegularExpressions
 
 namespace ReportWriterAPI
 
     public class PageFooterLine extends ReportLineBase
 
-        ; LINE PAGE_HEADER|PAGE_FOOTER [VISIBLE|NOTVISIBLE] [NUMBLANK LINES blank_lines]
+        ; LINE PAGE_FOOTER [VISIBLE|NOTVISIBLE] [NUMBLANK LINES blank_lines]
 
         public method PageFooterLine
             required in schemaRecord, string
         proc
-            ;TODO: Parse the schema record and populate properties
+            data parts = Regex.Matches(schemaRecord, "[\""].+?[\""]|[^ ]+").Cast<Match>().Select(lambda(m){m.Value}).ToList()
 
+            ;Remove the LINE and PAGE_FOOTER tokens, we already know about them
+            parts.RemoveRange(0,2)
 
+            data tmpInt, int
 
-
-
+            while (parts.Count > 0)
+            begin
+                using parts[0] select
+                ("VISIBLE"),
+                begin
+                    Visible = true
+                    parts.RemoveAt(0)
+                end
+                ("NOTVISIBLE"),
+                begin
+                    Visible = false
+                    parts.RemoveAt(0)
+                end
+                ("NUMBLANK"),
+                begin
+                    if ((parts.Count<3) || (parts[1]!="LINES") || (!int.TryParse(parts[2],tmpInt)))
+                    begin
+                        throw new ApplicationException("Invalid LINE PAGE_FOOTER NUMBLANK expression detected in report schema!")
+                    end
+                    BlankLines = tmpInt
+                    parts.RemoveRange(0,3)
+                end
+                endusing
+            end
         endmethod
 
         ; Line attributes
