@@ -5,12 +5,12 @@ import System.Text
 
 namespace ReportWriterAPI
 
-    public class ConditionSpec
+    public class ExpressionSpec
 
         ; field_spec  compare  value  [TRUEIFBLANK][connect  field_spec  compare  value  [TRUEIFBLANK]]  [...]
 
-        public method ConditionSpec
-            required in condition, string
+        public method ExpressionSpec
+            required in expression, string
         proc
             ;TODO: Parse the schema record and populate properties
 

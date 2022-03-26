@@ -1,0 +1,17 @@
+
+namespace ReportWriterAPI
+
+    public enum CalculationFieldType
+        AlphaNumeric,   1
+        Numeric,        2
+        Date,           3
+        Time,           4
+    endenum
+
+    public enum FieldJustification
+        Left,           1
+        Center,         2
+        Right,          3
+    endenum
+
+endnamespace

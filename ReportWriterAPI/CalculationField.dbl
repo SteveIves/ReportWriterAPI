@@ -1,7 +1,9 @@
+
 import System
 import System.Collections.Generic
+import System.Linq
 import System.Text
-
+import System.Text.RegularExpressions
 
 namespace ReportWriterAPI
 
@@ -14,13 +16,208 @@ namespace ReportWriterAPI
         public method CalculationField
             required in schemaRecord, string
         proc
-            ;TODO: Parse the schema record and populate properties
+            data parts = Regex.Matches(schemaRecord, "[\""].+?[\""]|[^ ]+").Cast<Match>().Select(lambda(m){m.Value}).ToList()
 
+            data tmpInt, int
 
+            while (parts.Count > 0)
+            begin
+                using parts[0] select
+                ("CALCULATION"),
+                begin
+                    if ((parts.Count<2) || String.IsNullOrWhiteSpace(parts[2]))
+                    begin
+                        throw new ApplicationException("Invalid CALCULATION expression detected in report schema!")
+                    end
+                    Name = parts[2]
+                    parts.RemoveRange(0,2)
+                end
+                ("TYPE"),
+                begin
+                    if ((parts.Count<2) || String.IsNullOrWhiteSpace(parts[2]))
+                    begin
+                        throw new ApplicationException("Invalid CALCULATION TYPE expression detected in report schema!")
+                    end
+                    using parts[2] select
+                    ("ALPHANUMERIC"),
+                        DataType = CalculationFieldType.AlphaNumeric
+                    ("NUMERIC"),
+                        DataType = CalculationFieldType.Numeric
+                    ("DATE"),
+                        DataType = CalculationFieldType.Date
+                    ("TIME"),
+                        DataType = CalculationFieldType.Time
+                    (),
+                        throw new ApplicationException("Invalid CALCULATION TYPE expression detected in report schema!")
+                    endusing
+                    parts.RemoveRange(0,2)
+                end
+                ("SIZE"),
+                begin
+                    if ((parts.Count<2) || (!int.TryParse(parts[2],tmpInt)))
+                    begin
+                        throw new ApplicationException("Invalid CALCULATION SIZE expression detected in report schema!")
+                    end
+                    Size = tmpInt
+                    parts.RemoveRange(0,2)
+                end
+                ("PRECISION"),
+                begin
+                    if ((parts.Count<2) || (!int.TryParse(parts[2],tmpInt)))
+                    begin
+                        throw new ApplicationException("Invalid CALCULATION PRECISION expression detected in report schema!")
+                    end
+                    Precision = tmpInt
+                    parts.RemoveRange(0,2)
+                end
+                ("IF"),
+                begin
+                    ;First remove the IF token
+                    parts.RemoveAt(0)
 
+                    ;The first problem is knowing how many parts represent the condiitional spec
+                    ;because it is not quote delimited in the schema. So we will look forward in
+                    ;the parts list looking for another recognised CALCULATION keyword, or for the
+                    ;end of the list of parts.
 
+                    data keywords = "|TYPE|SIZE|PRECISION|EXPRESSION|ALTERNATE|DESCRIPTION|JUST|FORMAT|AFTER_SORT|"
+                    data ix = 0
+                    data endIx = parts.Count - 1
 
+                    for ix from 0 thru parts.Count - 1
+                    begin
+                        if (keywords.Contains(String.Format("|{0}|",parts[0])))
+                        begin
+                            endIx = ix - 1
+                            exitloop
+                        end
+                    end
+
+                    data expression = String.Empty
+
+                    for ix from 0 thru endIx
+                    begin
+                        expression = String.Format("{0} {1} ",expression,parts[ix])
+                    end
+
+                    Condition = new ConditionSpec(expression)
+
+                    parts.RemoveRange(0,endIx+1)
+
+                end
+                ("EXPRESSION"),
+                begin
+                    if ((parts.Count<2) || String.IsNullOrWhiteSpace(parts[2]))
+                    begin
+                        throw new ApplicationException("Invalid CALCULATION EXPRESSION expression detected in report schema!")
+                    end
+                    Expression = new ExpressionSpec(parts[2].Replace('"',''))
+                    parts.RemoveRange(0,2)
+                end
+                ("ALTERNATE"),
+                begin
+                    if ((parts.Count<2) || String.IsNullOrWhiteSpace(parts[2]))
+                    begin
+                        throw new ApplicationException("Invalid CALCULATION ALTERNATE expression detected in report schema!")
+                    end
+                    AlternateExpression = new ExpressionSpec(parts[2].Replace('"',''))
+                    parts.RemoveRange(0,2)
+                end
+                ("DESCRIPTION"),
+                begin
+                    if ((parts.Count<2) || String.IsNullOrWhiteSpace(parts[2]))
+                    begin
+                        throw new ApplicationException("Invalid CALCULATION ALTERNATE expression detected in report schema!")
+                    end
+                    Description = parts[2].Replace('"','')
+                    parts.RemoveRange(0,2)
+                end
+                ("JUST"),
+                begin
+                    if ((parts.Count<2) || String.IsNullOrWhiteSpace(parts[2]))
+                    begin
+                        throw new ApplicationException("Invalid CALCULATION JUST expression detected in report schema!")
+                    end
+                    using parts[2] select
+                    ("LEFT"),
+                        Justification = FieldJustification.Left
+                    ("CENTER"),
+                        Justification = FieldJustification.Center
+                    ("RIGHT"),
+                        Justification = FieldJustification.Right
+                    (),
+                        throw new ApplicationException("Invalid CALCULATION JUST expression detected in report schema!")
+                    endusing
+                    parts.RemoveRange(0,2)
+                end
+                ("FORMAT"),
+                begin
+                    if ((parts.Count<2) || String.IsNullOrWhiteSpace(parts[2]))
+                    begin
+                        throw new ApplicationException("Invalid FORMAT expression detected in report schema!")
+                    end
+                    FormatString = parts[2]
+                    parts.RemoveRange(0,2)
+                end
+                ("AFTER_SORT"),
+                begin
+
+                end
+                endusing
+            end
         endmethod
+
+        public readwrite property Name, string
+
+        ;;; <summary>
+        ;;; The data type of the calculation’s result.
+        ;;; </summary>
+        public readwrite property DataType, CalculationFieldType
+
+        ;;; <summary>
+        ;;; The length of the calculation’s result. When using date or time fields in your calculation, the length should match the storage length of the base value in the expression.
+        ;;; </summary>
+        public readwrite property Size, int
+
+        ;;; <summary>
+        ;;; The number of characters to the right of the decimal in the implied-decimal calculation field. If the data type is implied-decimal, this attribute must be present, and it must be less than or equal to the size of the field. Otherwise, the field is ignored.
+        ;;; </summary>
+        public readwrite property Precision, int
+
+        ;;; <summary>
+        ;;; Specifies a condition or set of conditions in a report. The conditional_spec can have up to five conditions connected together.
+        ;;; </summary>
+        public readwrite property Condition, @ConditionSpec
+
+        ;;; <summary>
+        ;;; The calculation’s expression. It can have up to 150 characters.
+        ;;; </summary>
+        public readwrite property Expression, @ExpressionSpec
+
+        ;;; <summary>
+        ;;; The calculation’s alternate expression. It can have up to 150 characters.
+        ;;; </summary>
+        public readwrite property AlternateExpression, @ExpressionSpec
+
+        ;;; <summary>
+        ;;; A description of the calculation field. It can have up to 40 characters.
+        ;;; </summary>
+        public readwrite property Description, string
+
+        ;;; <summary>
+        ;;; The justification of the calculation field.
+        ;;; </summary>
+        public readwrite property Justification, FieldJustification
+
+        ;;; <summary>
+        ;;; The display format for the calculation field. It can have up to 40 characters.
+        ;;; </summary>
+        public readwrite property FormatString, string
+
+        ;;; <summary>
+        ;;; Indicates that the calculation field will be evaluated after the sort. If the field is dependent on one or more subtotal access fields, it is automatically evaluated after the sort.
+        ;;; </summary>
+        public readwrite property EvaluateAfterSort, boolean
 
     endclass
 

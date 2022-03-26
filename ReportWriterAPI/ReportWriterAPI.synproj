@@ -16,6 +16,8 @@
     <PackageReference Include="Synergex.SynergyDE.synrnt" Version="12.*" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Enumerations.dbl" />
+    <Compile Include="ExpressionSpec.dbl" />
     <Compile Include="Properties\AssemblyInfo.dbl" />
     <Compile Include="CalculationField.dbl" />
     <Compile Include="ConditionSpec.dbl" />

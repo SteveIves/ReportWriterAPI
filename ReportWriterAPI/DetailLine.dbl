@@ -22,7 +22,7 @@ namespace ReportWriterAPI
 
         ; Line attributes
 
-        public readwrite property ConditionSpec, @ConditionSpec
+        public readwrite property Condition, @ConditionSpec
 
     endclass
 

@@ -135,10 +135,7 @@ namespace ReportWriterAPI
                 end
                 endusing
             end
-
         endmethod
-
-
 
         ;;; <summary>
         ;;; 
