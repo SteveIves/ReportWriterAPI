@@ -10,6 +10,17 @@ namespace ReportWriterAPI
         ; ENVIRONMENT name TYPE type SIZE size [DESCRIPTION "description"][FORMAT "format"] 
         ; [USERTEXT "user_text"] [PRECISION dec_places] [STORED store_format] [JUST just]
 
+        public method EnvironmentField
+            required in schemaRecord, string
+        proc
+            ;TODO: Parse the schema record and populate properties
+
+
+
+
+
+        endmethod
+
     endclass
 
 endnamespace

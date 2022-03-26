@@ -5,11 +5,11 @@ import System.Text
 
 namespace ReportWriterAPI
 
-    public class DetailLine extends ReportLineBase
+    public class PageFooterLine extends ReportLineBase
 
-        ; LINE DETAIL [IF conditional_spec]
+        ; LINE PAGE_HEADER|PAGE_FOOTER [VISIBLE|NOTVISIBLE] [NUMBLANK LINES blank_lines]
 
-        public method DetailLine
+        public method PageFooterLine
             required in schemaRecord, string
         proc
             ;TODO: Parse the schema record and populate properties
@@ -22,7 +22,9 @@ namespace ReportWriterAPI
 
         ; Line attributes
 
-        public readwrite property ConditionSpec, @ConditionSpec
+        public readwrite property BlankLines, int, 0
+
+        public readwrite property Visible, boolean, false
 
     endclass
 

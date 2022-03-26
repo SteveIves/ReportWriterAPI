@@ -11,6 +11,17 @@ namespace ReportWriterAPI
         ; [IF conditional_spec] EXPRESSION "expression" [ALTERNATE "alt_expression"] 
         ; [DESCRIPTION "description"] [JUST just] [FORMAT "format"] [AFTER_SORT]
 
+        public method CalculationField
+            required in schemaRecord, string
+        proc
+            ;TODO: Parse the schema record and populate properties
+
+
+
+
+
+        endmethod
+
     endclass
 
 endnamespace

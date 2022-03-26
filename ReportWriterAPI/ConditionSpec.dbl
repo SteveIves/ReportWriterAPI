@@ -9,6 +9,18 @@ namespace ReportWriterAPI
 
         ; field_spec  compare  value  [TRUEIFBLANK][connect  field_spec  compare  value  [TRUEIFBLANK]]  [...]
 
+        public method ConditionSpec
+            required in schemaRecord, string
+        proc
+            ;TODO: Parse the schema record and populate properties
+
+
+
+
+
+        endmethod
+
+
     endclass
 
 endnamespace

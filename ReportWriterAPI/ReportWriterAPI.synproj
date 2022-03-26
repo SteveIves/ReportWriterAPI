@@ -16,19 +16,22 @@
     <PackageReference Include="Synergex.SynergyDE.synrnt" Version="12.*" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ConditionSpec.dbl" />
-    <Compile Include="FieldSpec.dbl" />
-    <Compile Include="PageHeaderFooterLine.dbl" />
-    <Compile Include="PrePostBreakLine.dbl" />
     <Compile Include="Properties\AssemblyInfo.dbl" />
-    <Compile Include="ReportHeaderFooterLine.dbl" />
     <Compile Include="CalculationField.dbl" />
+    <Compile Include="ConditionSpec.dbl" />
+    <Compile Include="DetailLine.dbl" />
     <Compile Include="EnvironmentField.dbl" />
     <Compile Include="Field.dbl" />
-    <Compile Include="File.dbl" />
-    <Compile Include="DetailLine.dbl" />
+    <Compile Include="FieldSpec.dbl" />
+    <Compile Include="ReportFile.dbl" />
+    <Compile Include="PageFooterLine.dbl" />
+    <Compile Include="PageHeaderLine.dbl" />
+    <Compile Include="PrePostBreakLine.dbl" />
     <Compile Include="QuestionField.dbl" />
     <Compile Include="Report.dbl" />
+    <Compile Include="ReportFooterLine.dbl" />
+    <Compile Include="ReportHeaderLine.dbl" />
+    <Compile Include="ReportLineBase.dbl" />
     <Compile Include="Selection.dbl" />
     <Compile Include="SortField.dbl" />
     <Compile Include="SubtotalAccessField.dbl" />

@@ -10,6 +10,17 @@ namespace ReportWriterAPI
         ; SUBTOTAL name TOTALFIELD totalfield BREAKFIELD breakfield 
         ; TOTALTYPE type [DESCRIPTION "description"]
 
+        public method SubTotalAccessField
+            required in schemaRecord, string
+        proc
+            ;TODO: Parse the schema record and populate properties
+
+
+
+
+
+        endmethod
+
     endclass
 
 endnamespace

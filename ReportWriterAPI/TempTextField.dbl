@@ -9,6 +9,17 @@ namespace ReportWriterAPI
 
         ; TEMPTEXT name TTEXT "text" [DESCRIPTION "description"]
 
+        public method TempTextField
+            required in schemaRecord, string
+        proc
+            ;TODO: Parse the schema record and populate properties
+
+
+
+
+
+        endmethod
+
     endclass
 
 endnamespace

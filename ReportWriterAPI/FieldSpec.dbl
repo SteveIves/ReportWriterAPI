@@ -16,6 +16,17 @@ namespace ReportWriterAPI
         ; A field_spec with optional ranging has the format
         ; field[(offset:length)] [FID fid]
 
+        public method FieldSpec
+            required in schemaRecord, string
+        proc
+            ;TODO: Parse the schema record and populate properties
+
+
+
+
+
+        endmethod
+
     endclass
 
 endnamespace

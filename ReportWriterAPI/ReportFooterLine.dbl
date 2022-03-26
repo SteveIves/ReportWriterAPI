@@ -1,0 +1,34 @@
+import System
+import System.Collections.Generic
+import System.Text
+
+
+namespace ReportWriterAPI
+
+    public class ReportFooterLine extends ReportLineBase
+
+        ; LINE REPORT_HEADER|REPORT_FOOTER [VISIBLE|NOTVISIBLE] [NOTSEPARATE]
+        ; [NUMBLANK LINES blank_lines]
+
+        public method ReportFooterLine
+            required in schemaRecord, string
+        proc
+            ;TODO: Parse the schema record and populate properties
+
+
+
+
+
+        endmethod
+
+        ; Line attributes
+
+        public readwrite property BlankLines, int, 0
+
+        public readwrite property SeparatePage, boolean, true
+
+        public readwrite property Visible, boolean, false
+
+    endclass
+
+endnamespace

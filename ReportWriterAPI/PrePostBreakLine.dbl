@@ -5,9 +5,20 @@ import System.Text
 
 namespace ReportWriterAPI
 
-    public class PrePostBreakLine
+    public class PrePostBreakLine extends ReportLineBase
 
         ; LINE PRE-BREAK|POST-BREAK [IF conditional_spec] [SUPPRESS BLANKLINE] BREAKFIELD field_spec [SID sid]
+
+        public method PrePostBreakLine
+            required in schemaRecord, string
+        proc
+            ;TODO: Parse the schema record and populate properties
+
+
+
+
+
+        endmethod
 
         ; Line attributes
 
@@ -15,16 +26,9 @@ namespace ReportWriterAPI
 
         public readwrite property ConditionSpec, @ConditionSpec
 
-        public readwrite property SortId, int
+        public readwrite property SortId, int, 0
 
-        public readwrite property SuppressBlankLine, boolean
-
-        ; Line content
-
-        public readwrite property Fields, @List<Field>
-
-        public readwrite property TextFields, @List<TextField>
-
+        public readwrite property SuppressBlankLine, boolean, false
 
     endclass
 

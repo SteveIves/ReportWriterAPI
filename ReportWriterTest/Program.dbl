@@ -1,6 +1,8 @@
+
 import System
 import System.Collections.Generic
 import System.Text
+import ReportWriterAPI
 
 namespace ReportWriterTest
 
@@ -10,6 +12,25 @@ namespace ReportWriterTest
     main
 
     proc
+        data reportSchema = "D:\ReportWriterAPI\ReportWriter\reports.rdl"
+        data rpt, @Report
+
+        try
+        begin
+            rpt = new Report(reportSchema)
+        end
+        catch (e, @Exception)
+        begin
+            Console.WriteLine(e.Message)
+        end
+        endtry
+
+
+
+        clear rpt
+
+        Console.Write("Press a key: ")
+        Console.ReadKey()
 
     endmain
 

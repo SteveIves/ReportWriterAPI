@@ -1,0 +1,16 @@
+
+import System
+import System.Collections.Generic
+import System.Text
+
+namespace ReportWriterAPI
+
+    public class ReportLineBase
+
+        public readwrite property Fields, @List<Field>, new List<Field>()
+
+        public readwrite property TextFields, @List<TextField>, new List<TextField>()
+
+    endclass
+
+endnamespace

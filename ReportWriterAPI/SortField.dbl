@@ -10,6 +10,17 @@ namespace ReportWriterAPI
         ; SORT field_spec [REVERSE] [LINEBREAK] [PAGEBREAK] [MERGE]
         ; [BY field_spec [REVERSE] [LINEBREAK] [PAGEBREAK] [MERGE]...]
 
+        public method SortField
+            required in schemaRecord, string
+        proc
+            ;TODO: Parse the schema record and populate properties
+
+
+
+
+
+        endmethod
+
     endclass
 
 endnamespace

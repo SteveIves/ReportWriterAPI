@@ -11,6 +11,17 @@ namespace ReportWriterAPI
         ; [FORMAT "format"] [DEFAULT "default"] [INFO LINE "info_line"] [JUST just]
         ; [REQUIRED]
 
+        public method QuestionField
+            required in schemaRecord, string
+        proc
+            ;TODO: Parse the schema record and populate properties
+
+
+
+
+
+        endmethod
+
     endclass
 
 endnamespace

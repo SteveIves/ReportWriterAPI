@@ -2,47 +2,286 @@
 import System
 import System.Collections.Generic
 import System.IO
+import System.Linq
 import System.Text
+import System.Text.RegularExpressions
 
 namespace ReportWriterAPI
 
+    ;;; <summary>
+    ;;; 
+    ;;; </summary>
     public class Report
 
+        private currentLine, @ReportLineBase
+
+        ;;; <summary>
+        ;;; 
+        ;;; </summary>
+        ;;; <param name="aReportFile"></param>
         public method Report
             required in aReportFile, string
         proc
-            if (File.Exists(aReportFile)) then
-            begin
-                ParseReportDefinition(aReportFile)
-            end
-            else
-            begin
-                throw new ApplicationException("ERROR: Report definition file {0} was not found!")
-            end
+            ParseReportDefinition(aReportFile)
         endmethod
 
+        ;;; <summary>
+        ;;; 
+        ;;; </summary>
+        ;;; <param name="aReportFile"></param>
         private method parseReportDefinition, void
             required in aReportFile, string
         proc
-            ; Load the report definition into a list
-            ; - Ignore blank lines
-            ; - Ignore lines beginning ;
+            ; Verify that the file exists
+            if (!File.Exists(aReportFile))
+            begin
+                throw new ApplicationException("ERROR: Report schema {0} was not found!")
+            end
 
-            data reportLines, @List<string>, new List<string>(File.ReadAllLines(aReportFile))
+            ; Load the report definition into a list, removing blank lines and comments
+            data schemaRecords = new List<string>(File.ReadAllLines(aReportFile)
+            &    .Where(lambda(s) { !String.IsNullOrWhiteSpace(s) && !s.Trim().StartsWith(";") } )
+            &   .ToList<string>())
+
+            ; Was the file empty?
+            if (schemaRecords.Count == 0)
+            begin
+                throw new ApplicationException(String.Format("ERROR: Report schema {0} is empty!",aReportFile))
+            end
 
             ; Consolidate multiple lines into single lines
+            data lineNumber = 0
+            while (lineNumber < schemaRecords.Count)
+            begin
+                if (schemaRecords[lineNumber].StartsWith("    ")) then
+                begin
+                    schemaRecords[lineNumber-1] = schemaRecords[lineNumber-1].Trim() + " " + schemaRecords[lineNumber].Trim()
+                    schemaRecords.RemoveAt(lineNumber)
+                end
+                else if (schemaRecords[lineNumber].StartsWith("REPORT")) then
+                begin
+                    schemaRecords[lineNumber] = schemaRecords[lineNumber].Replace(%char(9),%char(32))
+                    lineNumber += 1
+                end
+                else
+                begin
+                    lineNumber += 1
+                end
+            end
 
+            ; Now process the content of the report schema
 
-            ; First should be the definition of the report name, like:
-            ; REPORT "CUSTOMERS"
+            data schemaRecord, string
+            foreach schemaRecord in schemaRecords
+            begin
+                if (schemaRecord.StartsWith("REPORT")) then
+                begin
+                    ;Extact report name
 
+                end
+                else if (schemaRecord.StartsWith("FILE")) then
+                begin
+                    ReportFiles.Add(new ReportFile(schemaRecord))
+                end
+                else if (schemaRecord.StartsWith("CALCULATION")) then
+                begin
+                    CalculationFields.Add(new CalculationField(schemaRecord))
+                end
+                else if (schemaRecord.StartsWith("ENVIRONMENT")) then
+                begin
+                    EnvironmentFields.Add(new EnvironmentField(schemaRecord))
+                end
+                else if (schemaRecord.StartsWith("QUESTION")) then
+                begin
+                    QuestionFields.Add(new QuestionField(schemaRecord))
+                end
+                else if (schemaRecord.StartsWith("SUBTOTAL")) then
+                begin
+                    SubtotalAccessFields.Add(new SubtotalAccessField(schemaRecord))
+                end
+                else if (schemaRecord.StartsWith("TEMPTEXT")) then
+                begin
+                    TempTextFields.Add(new TempTextField(schemaRecord))
+                end
+                else if (schemaRecord.StartsWith("SELECT")) then
+                begin
+                    Selections.Add(new Selection(schemaRecord))
+                end
+                else if (schemaRecord.StartsWith("SORT")) then
+                begin
+                    SortFields.Add(new SortField(schemaRecord))
+                end
+                else if (schemaRecord.StartsWith("LINE REPORT_HEADER")) then
+                begin
+                    currentLine = new ReportHeaderLine(schemaRecord)
+                    ReportHeaderLines.Add((@ReportHeaderLine)currentLine)
+                end
+                else if (schemaRecord.StartsWith("LINE REPORT_FOOTER")) then
+                begin
+                    currentLine = new ReportFooterLine(schemaRecord)
+                    ReportFooterLines.Add((@ReportFooterLine)currentLine)
+                end
+                else if (schemaRecord.StartsWith("LINE PAGE_HEADER")) then
+                begin
+                    currentLine = new PageHeaderLine(schemaRecord)
+                    PageHeaderLines.Add((@PageHeaderLine)currentLine)
+                end
+                else if (schemaRecord.StartsWith("LINE PAGE_FOOTER")) then
+                begin
+                    currentLine = new PageFooterLine(schemaRecord)
+                    PageFooterLines.Add((@PageFooterLine)currentLine)
+                end
+                else if (schemaRecord.StartsWith("LINE PRE-BREAK")) then
+                begin
+                    currentLine = new PrePostBreakLine(schemaRecord)
+                    PreBreakLines.Add((@PrePostBreakLine)currentLine)
+                end
+                else if (schemaRecord.StartsWith("LINE POST-BREAK")) then
+                begin
+                    currentLine = new PrePostBreakLine(schemaRecord)
+                    PostBreakLines.Add((@PrePostBreakLine)currentLine)
+                end
+                else if (schemaRecord.StartsWith("LINE DETAIL")) then
+                begin
+                    currentLine = new DetailLine(schemaRecord)
+                    DetailLines.Add((@DetailLine)currentLine)
+                end
+                else if (schemaRecord.StartsWith("FIELD")) then
+                begin
+                    currentLine.Fields.Add(new Field(schemaRecord))
+                end
+                else if (schemaRecord.StartsWith("TEXT")) then
+                begin
+                    currentLine.TextFields.Add(new TextField(schemaRecord))
+                end
+                else if (schemaRecord.StartsWith("MISCELLANEOUS"))
+                begin
+                    parseMiscellaneousSettings(schemaRecord)
+                end
+            end
+        endmethod
 
-            ; Now FILE definitions, one or more, e.g.:
-            ; FILE CUSTOMERS.CUSTOMERS  ID 1
+        ;;; <summary>
+        ;;; 
+        ;;; </summary>
+        ;;; <param name="schemaRecord"></param>
+        private method parseMiscellaneousSettings, void
+            required in schemaRecord, string
+        proc
+            ;MISCELLANEOUS [LINES PERPAGE lines] [NUMBLANK LINES blank_lines] 
+            ;[NUMBRKBLANK LINES brk_blank_lines] [BREAK COUNT] [NODATE ANDPAGNUM] 
+            ;[NODETAIL LINES] [NORECORD COUNT] [NOFORMFEED] [NODASHED LINES] 
+            ;[NOTOTAL DESCR] [REPORT DESCR "description"]
 
-            ; Selections
+            ;data parts = schemaRecord.Split(" ").ToList<string>()
 
+            data parts = Regex.Matches(schemaRecord, "[\""].+?[\""]|[^ ]+").Cast<Match>().Select(lambda(m){m.Value}).ToList()
 
+            ;Remove the "MISCELLANEOUS" token, we already know about that
+            parts.RemoveAt(0)
+
+            data tmpInt, int
+
+            while (parts.Count > 0)
+            begin
+                using parts[0] select
+                ("LINES"),
+                begin
+                    if ((parts.Count<3) || (parts[1]!="PERPAGE") || (!int.TryParse(parts[2],tmpInt)))
+                    begin
+                        throw new ApplicationException("Invalid MISCELLANEOUS LINES expression detected in report schema!")
+                    end
+                    LinesPerPage = tmpInt
+                    parts.RemoveRange(0,3)
+                end
+                ("NUMBLANK"),
+                begin
+                    if ((parts.Count<3) || (parts[1]!="LINES") || (!int.TryParse(parts[2],tmpInt)))
+                    begin
+                        throw new ApplicationException("Invalid MISCELLANEOUS NUMBLANK expression detected in report schema!")
+                    end
+                    LinesBetweenDataRecords = tmpInt
+                    parts.RemoveRange(0,3)
+                end
+                ("NUMBRKBLANK"),
+                begin
+                    if ((parts.Count<3) || (parts[1]!="LINES") || (!int.TryParse(parts[2],tmpInt)))
+                    begin
+                        throw new ApplicationException("Invalid MISCELLANEOUS NUMBRKBLANK expression detected in report schema!")
+                    end
+                    LinesBetweenBreakSets = tmpInt
+                    parts.RemoveRange(0,3)
+                end
+                ("BREAK"),
+                begin
+                    if ((parts.Count<2) || (parts[1]!="COUNT"))
+                    begin
+                        throw new ApplicationException("Invalid MISCELLANEOUS BREAK expression detected in report schema!")
+                    end
+                    BreakCount = true
+                    parts.RemoveRange(0,2)
+                end
+                ("NODATE"),
+                begin
+                    if ((parts.Count<2) || (parts[1]!="ANDPAGNUM"))
+                    begin
+                        throw new ApplicationException("Invalid MISCELLANEOUS NODATE expression detected in report schema!")
+                    end
+                    PageHeadersShowDateAndPageNumber = false
+                    parts.RemoveRange(0,2)
+                end
+                ("NODETAIL"),
+                begin
+                    if ((parts.Count<2) || (parts[1]!="LINES"))
+                    begin
+                        throw new ApplicationException("Invalid MISCELLANEOUS NODETAIL expression detected in report schema!")
+                    end
+                    ShowDetailLines = false
+                    parts.RemoveRange(0,2)
+                end
+                ("NORECORD"),
+                begin
+                    if ((parts.Count<2) || (parts[1]!="COUNT"))
+                    begin
+                        throw new ApplicationException("Invalid MISCELLANEOUS NORECORD expression detected in report schema!")
+                    end
+                    ShowRecordCount = false
+                    parts.RemoveRange(0,2)
+                end
+                ("NOFORMFEED"),
+                begin
+                    UseFormFeed = false
+                    parts.RemoveAt(0)
+                end
+                ("NODASHED"),
+                begin
+                    if ((parts.Count<2) || (parts[1]!="LINES"))
+                    begin
+                        throw new ApplicationException("Invalid MISCELLANEOUS NODASHED expression detected in report schema!")
+                    end
+                    TotalDashedLines = false
+                    parts.RemoveRange(0,2)
+                end
+                ("NOTOTAL"),
+                begin
+                    if ((parts.Count<2) || (parts[1]!="DESCR"))
+                    begin
+                        throw new ApplicationException("Invalid MISCELLANEOUS NOTOTAL expression detected in report schema!")
+                    end
+                    TotalDescriptions = false
+                    parts.RemoveRange(0,2)
+                end
+                ("REPORT"),
+                begin
+                    if ((parts.Count<3) || (parts[1]!="DESCR") || String.IsNullOrWhiteSpace(parts[2]))
+                    begin
+                        throw new ApplicationException("Invalid MISCELLANEOUS REPORT expression detected in report schema!")
+                    end
+                    Description = parts[2].Replace('"','')
+                    parts.RemoveRange(0,3)
+                end
+                endusing
+            end
 
         endmethod
 
@@ -52,38 +291,139 @@ namespace ReportWriterAPI
 
         ; Report attributes
 
-        public readwrite property CalculationFields, @List<CalculationField>
+        ;;; <summary>
+        ;;; 
+        ;;; </summary>
+        public readwrite property CalculationFields, @List<CalculationField>, new List<CalculationField>()
 
-        public readwrite property EnvironmentFields, @List<EnvironmentField>
+        ;;; <summary>
+        ;;; 
+        ;;; </summary>
+        public readwrite property EnvironmentFields, @List<EnvironmentField>, new List<EnvironmentField>()
 
-        public readwrite property Files, @List<File>
+        ;;; <summary>
+        ;;; 
+        ;;; </summary>
+        public readwrite property ReportFiles, @List<ReportFile>, new List<ReportFile>()
 
-        public readwrite property QuestionFields, @List<QuestionField>
+        ;;; <summary>
+        ;;; 
+        ;;; </summary>
+        public readwrite property QuestionFields, @List<QuestionField>, new List<QuestionField>()
 
-        public readwrite property Selections, @List<Selection>
+        ;;; <summary>
+        ;;; 
+        ;;; </summary>
+        public readwrite property Selections, @List<Selection>, new List<Selection>()
 
-        public readwrite property SortFields, @List<SortField>
+        ;;; <summary>
+        ;;; 
+        ;;; </summary>
+        public readwrite property SortFields, @List<SortField>, new List<SortField>()
 
-        public readwrite property SubtotalAccessFields, @List<SubtotalAccessField>
+        ;;; <summary>
+        ;;; 
+        ;;; </summary>
+        public readwrite property SubtotalAccessFields, @List<SubtotalAccessField>, new List<SubtotalAccessField>()
 
-        public readwrite property TempTextFields, @List<TempTextField>
+        ;;; <summary>
+        ;;; 
+        ;;; </summary>
+        public readwrite property TempTextFields, @List<TempTextField>, new List<TempTextField>()
 
         ; Report sections
 
-        public readwrite property ReportHeaderLines, @List<ReportHeaderFooterLine>
+        ;;; <summary>
+        ;;; 
+        ;;; </summary>
+        public readwrite property ReportHeaderLines, @List<ReportHeaderLine>, new List<ReportHeaderLine>()
 
-        public readwrite property PageHeaderLines, @List<PageHeaderFooterLine>
+        ;;; <summary>
+        ;;; 
+        ;;; </summary>
+        public readwrite property PageHeaderLines, @List<PageHeaderLine>, new List<PageHeaderLine>()
 
-        public readwrite property ReportPreBreakLines, @List<PrePostBreakLine>
+        ;;; <summary>
+        ;;; 
+        ;;; </summary>
+        public readwrite property PreBreakLines, @List<PrePostBreakLine>, new List<PrePostBreakLine>()
 
-        public readwrite property ReportDetailLines, @List<DetailLine>
+        ;;; <summary>
+        ;;; 
+        ;;; </summary>
+        public readwrite property DetailLines, @List<DetailLine>, new List<DetailLine>()
 
-        public readwrite property ReportPostBreakLines, @List<PrePostBreakLine>
+        ;;; <summary>
+        ;;; 
+        ;;; </summary>
+        public readwrite property PostBreakLines, @List<PrePostBreakLine>, new List<PrePostBreakLine>()
 
-        public readwrite property PageFooterLines, @List<PageHeaderFooterLine>
+        ;;; <summary>
+        ;;; 
+        ;;; </summary>
+        public readwrite property PageFooterLines, @List<PageFooterLine>, new List<PageFooterLine>()
 
-        public readwrite property ReportFooterLines, @List<ReportHeaderFooterLine>
+        ;;; <summary>
+        ;;; 
+        ;;; </summary>
+        public readwrite property ReportFooterLines, @List<ReportFooterLine>, new List<ReportFooterLine>()
 
+        ; Report miscellaneous settings
+
+        ;;; <summary>
+        ;;; 
+        ;;; </summary>
+        public readwrite property Description, string, String.Empty
+
+        ;;; <summary>
+        ;;; 
+        ;;; </summary>
+        public readwrite property LinesPerPage, int, 66
+
+        ;;; <summary>
+        ;;; 
+        ;;; </summary>
+        public readwrite property LinesBetweenDataRecords, int, 0
+
+        ;;; <summary>
+        ;;; 
+        ;;; </summary>
+        public readwrite property LinesBetweenBreakSets, int, 2
+
+        ;;; <summary>
+        ;;; 
+        ;;; </summary>
+        public readwrite property BreakCount, boolean, false
+
+        ;;; <summary>
+        ;;; 
+        ;;; </summary>
+        public readwrite property PageHeadersShowDateAndPageNumber, boolean, true
+
+        ;;; <summary>
+        ;;; 
+        ;;; </summary>
+        public readwrite property ShowDetailLines, boolean, true
+
+        ;;; <summary>
+        ;;; 
+        ;;; </summary>
+        public readwrite property ShowRecordCount, boolean, true
+
+        ;;; <summary>
+        ;;; 
+        ;;; </summary>
+        public readwrite property UseFormFeed, boolean, true
+
+        ;;; <summary>
+        ;;; 
+        ;;; </summary>
+        public readwrite property TotalDashedLines, boolean, true
+
+        ;;; <summary>
+        ;;; 
+        ;;; </summary>
+        public readwrite property TotalDescriptions, boolean, true
 
     endclass
 

@@ -11,6 +11,17 @@ namespace ReportWriterAPI
         ; [FORMAT "format"] [FMTTRUNC truncate] [STRIP] [STRIPCHR "strip_char"]
         ; [TOTAL] [IF conditional_spec]
 
+        public method Field
+            required in schemaRecord, string
+        proc
+            ;TODO: Parse the schema record and populate properties
+
+
+
+
+
+        endmethod
+
     endclass
 
 endnamespace

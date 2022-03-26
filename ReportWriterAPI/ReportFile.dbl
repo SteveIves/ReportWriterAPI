@@ -1,0 +1,51 @@
+
+import System
+import System.Collections.Generic
+import System.Text
+
+namespace ReportWriterAPI
+
+    public class ReportFile
+
+        ; FILE file.structure [ID id] [PARENT pid] [SEPARATE] 
+        ; [RELATION name] | [[LINK_FIELD link_field] [LINK_NAME link_name] 
+        ; [TO_KEY to_key] [LINK_SEGMENT segment ...]]
+
+        public method ReportFile
+            required in schemaRecord, string
+        proc
+            ;TODO: Parse the schema record and populate properties
+
+
+
+
+
+        endmethod
+
+        public readwrite property RpsFileName, string
+
+        public readwrite property RpsStructureName, string
+
+        public readwrite property ID, int
+
+        public readwrite property ParentID, int
+
+        public readwrite property Separate, boolean
+
+        ; For repository defined relations
+
+        public readwrite property RpsRelationName, string
+
+        ; For locally defined relations
+
+        public readwrite property LinkField, string
+
+        public readwrite property LinkName, string
+
+        public readwrite property ToKey, string
+
+        public readwrite property LinkSegment, @List<string>
+
+    endclass
+
+endnamespace

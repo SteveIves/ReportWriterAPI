@@ -9,6 +9,17 @@ namespace ReportWriterAPI
 
         ; TEXT "text" COLUMN column
 
+        public method TextField
+            required in schemaRecord, string
+        proc
+            ;TODO: Parse the schema record and populate properties
+
+
+
+
+
+        endmethod
+
     endclass
 
 endnamespace
